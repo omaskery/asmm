@@ -2,7 +2,7 @@ import argparse
 import os
 
 
-from . import initialise, build, list_dependencies, add_dependency
+import asmm
 
 
 def main():
@@ -40,16 +40,19 @@ def main():
         parser.print_help()
         return
 
-    args.func(args)
+    try:
+        args.func(args)
+    except asmm.AsmmError as error:
+        print(f"error: {error}")
 
 
 def _initialise(args):
-    initialise(args.path)
+    asmm.initialise(args.path)
 
 
 def _build(args):
     path = os.getcwd() if args.directory is None else args.directory
-    build(path)
+    asmm.build(path)
 
 
 def _deps(args):
@@ -58,14 +61,14 @@ def _deps(args):
 
 def _deps_list(args):
     path = os.getcwd() if args.directory is None else args.directory
-    dependencies = list_dependencies(path)
+    dependencies = asmm.list_dependencies(path)
     for dependency in dependencies:
         print(f"{dependency}")
 
 
 def _deps_add(args):
     path = os.getcwd() if args.directory is None else args.directory
-    add_dependency(path, args.dependency)
+    asmm.add_dependency(path, args.dependency)
 
 
 if __name__ == "__main__":
