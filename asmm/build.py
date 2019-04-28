@@ -21,22 +21,15 @@ def build(target_directory):
 
     build_dir = _tgt_dir("build")
     assets_dir = _tgt_dir("assets")
-    mission_dir = _tgt_dir("missions")
-    test_mission_dir = _tgt_dir("test_missions")
-
-    missions = _list_folders_in(mission_dir)
-    test_missions = _list_folders_in(test_mission_dir)
 
     os.makedirs(build_dir, exist_ok=True)
-    for mission in missions:
-        src_path = os.path.join(mission_dir, mission)
-        dst_path = os.path.join(build_dir, "missions", mission)
-        _build_mission(assets_dir, src_path, dst_path)
-
-    for mission in test_missions:
-        src_path = os.path.join(test_mission_dir, mission)
-        dst_path = os.path.join(build_dir, "test_missions", mission)
-        _build_mission(assets_dir, src_path, dst_path)
+    for mission_kind in ["missions", "test_missions"]:
+        mission_dir = _tgt_dir(mission_kind)
+        missions = _list_folders_in(mission_dir)
+        for mission in missions:
+            src_path = os.path.join(mission_dir, mission)
+            dst_path = os.path.join(build_dir, mission_kind, mission)
+            _build_mission(assets_dir, src_path, dst_path)
 
 
 def _build_mission(assets_dir, src_path, dst_path):
