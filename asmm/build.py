@@ -1,0 +1,53 @@
+import shutil
+import os
+
+
+def build(target_directory):
+    def _tgt_dir(path):
+        return os.path.join(target_directory, path)
+
+    build_dir = _tgt_dir("build")
+    assets_dir = _tgt_dir("assets")
+    mission_dir = _tgt_dir("missions")
+    test_mission_dir = _tgt_dir("test_missions")
+
+    missions = _list_folders_in(mission_dir)
+    test_missions = _list_folders_in(test_mission_dir)
+
+    os.makedirs(build_dir, exist_ok=True)
+    for mission in missions:
+        src_path = os.path.join(mission_dir, mission)
+        dst_path = os.path.join(build_dir, "missions", mission)
+        build_mission(assets_dir, src_path, dst_path)
+
+    for mission in test_missions:
+        src_path = os.path.join(test_mission_dir, mission)
+        dst_path = os.path.join(build_dir, "test_missions", mission)
+        build_mission(assets_dir, src_path, dst_path)
+
+
+def build_mission(assets_dir, src_path, dst_path):
+    if os.path.isdir(dst_path):
+        shutil.rmtree(dst_path)
+    shutil.copytree(src_path, dst_path)
+    _merge_folders(assets_dir, dst_path)
+
+
+def _merge_folders(src_folder, dst_folder):
+    for root_dir, folders, files in os.walk(src_folder):
+        path_relative_to_assets = os.path.relpath(root_dir, src_folder)
+        path_into_dst = os.path.join(dst_folder, path_relative_to_assets)
+        os.makedirs(path_into_dst, exist_ok=True)
+
+        for file in files:
+            src_file_path = os.path.join(root_dir, file)
+            dst_file_path = os.path.join(path_into_dst, file)
+            shutil.copy(src_file_path, dst_file_path)
+
+
+def _list_folders_in(path):
+    return [
+        entry_name
+        for entry_name in os.listdir(path)
+        if os.path.isdir(os.path.join(path, entry_name))
+    ]
