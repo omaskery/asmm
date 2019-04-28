@@ -71,6 +71,13 @@ def sync_dependencies(target_directory, force_all=False):
 
 
 def _fetch_dependency(target_directory, cache_dir, dependency):
+    """
+    Retrieves a single dependency via its URI and stores it in the cache
+    :param target_directory: directory of the project currently being updated
+    :param cache_dir: directory to store cached dependencies in
+    :param dependency:
+    :return:
+    """
     dep_cache_name = _dependency_to_cache_name(dependency)
     target_folder = os.path.join(cache_dir, dep_cache_name)
     uri = urllib.parse.urlsplit(dependency)
@@ -80,6 +87,7 @@ def _fetch_dependency(target_directory, cache_dir, dependency):
         if os.path.isabs(uri.path):
             filepath = uri.path
         else:
+            # FIXME: these relative filepaths are going to really screw with recursive dependencies
             filepath = os.path.join(target_directory, uri.path)
         shutil.copytree(filepath, target_folder)
 
