@@ -34,6 +34,11 @@ def main():
         'dependency', help='URI of the dependency to add'
     )
     deps_add_parser.set_defaults(func=_deps_add, parser=deps_add_parser)
+    deps_remove_parser = deps_subparsers.add_parser('rm', help='remove a project dependency')
+    deps_remove_parser.add_argument(
+        'dependency', help='URI of the dependency to remove'
+    )
+    deps_remove_parser.set_defaults(func=_deps_rm, parser=deps_remove_parser)
     args = parser.parse_args()
 
     if args.func is None:
@@ -69,6 +74,11 @@ def _deps_list(args):
 def _deps_add(args):
     path = os.getcwd() if args.directory is None else args.directory
     asmm.add_dependency(path, args.dependency)
+
+
+def _deps_rm(args):
+    path = os.getcwd() if args.directory is None else args.directory
+    asmm.remove_dependency(path, args.dependency)
 
 
 if __name__ == "__main__":

@@ -30,3 +30,17 @@ def list_dependencies(target_directory):
     project_file_path = os.path.join(target_directory, ".asmm/config.yml")
     project = load_project(project_file_path)
     return project.dependencies
+
+
+def remove_dependency(target_directory, dependency):
+    """
+    Removes a dependency from the project
+    :param target_directory: directory of the project to modify
+    :param dependency: URI of project dependency to remove
+    """
+    project_file_path = os.path.join(target_directory, ".asmm/config.yml")
+    project = load_project(project_file_path)
+    if dependency not in project.dependencies:
+        raise AsmmError(f"project has no dependency '{dependency}'")
+    project.dependencies.remove(dependency)
+    save_project(project, project_file_path)

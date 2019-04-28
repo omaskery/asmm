@@ -51,6 +51,21 @@ class TestDependencies(unittest.TestCase):
         with self.assertRaises(asmm.AsmmError):
             asmm.add_dependency(self.temp_env.name, "dep")
 
+    def test_remove_dependency(self):
+        self._write_project_file({
+            "dependencies": ["one", "two", "three"]
+        })
+        asmm.remove_dependency(self.temp_env.name, "two")
+        project = self._read_project_file()
+        self.assertListEqual(project["dependencies"], ["one", "three"])
+
+    def test_remove_non_existant_dependency_should_fail(self):
+        self._write_project_file({
+            "dependencies": []
+        })
+        with self.assertRaises(asmm.AsmmError):
+            asmm.remove_dependency(self.temp_env.name, "not-existant")
+
     def _write_project_file(self, yml):
         path = self.temp_env.path_into(".asmm/config.yml")
         with open(path, 'w') as file:
