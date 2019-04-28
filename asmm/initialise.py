@@ -6,8 +6,10 @@ A folder is created to contain asmm specific data: .asmm,
 which contains a configuration file and a cache for external
 dependencies.
 """
-import yaml
 import os
+
+
+from .project import Project, save_project
 
 
 def initialise(target_directory):
@@ -23,9 +25,7 @@ def initialise(target_directory):
     os.makedirs(os.path.join(target_directory, "test_missions"), exist_ok=True)
     os.makedirs(os.path.join(target_directory, "assets"), exist_ok=True)
     os.makedirs(os.path.join(asmm_folder, "cache/deps"), exist_ok=True)
-    project = {
-        "dependencies": []
-    }
 
-    with open(os.path.join(asmm_folder, "config.yml"), "w") as project_file:
-        yaml.dump(project, project_file)
+    project_file_path = os.path.join(asmm_folder, "config.yml")
+    project = Project()
+    save_project(project, project_file_path)
