@@ -1,5 +1,8 @@
 """Manages the dependencies of a project
 """
+import urllib.parse
+import hashlib
+import shutil
 import os
 
 
@@ -44,3 +47,43 @@ def remove_dependency(target_directory, dependency):
         raise AsmmError(f"project has no dependency '{dependency}'")
     project.dependencies.remove(dependency)
     save_project(project, project_file_path)
+
+
+def fetch_dependencies(target_directory, force_all=False):
+    """
+    Retrieves dependencies from their specified URIs and populates the dependency cache
+    :param target_directory: directory of the project to fetch dependencies of
+    :param force_all: when set, retrieves all dependencies, otherwise only fetches those not in the cache
+    """
+    cache_dir = os.path.join(target_directory, ".asmm/cache/deps")
+    to_update = list_dependencies(target_directory)
+    if not force_all:
+        cached_dependencies = os.listdir(cache_dir)
+        to_update = [
+            dependency for dependency in to_update
+            if _dependency_to_cache_name(dependency) not in cached_dependencies
+        ]
+    for dependency in to_update:
+        _fetch_dependency(target_directory, cache_dir, dependency)
+
+
+def _fetch_dependency(target_directory, cache_dir, dependency):
+    dep_cache_name = _dependency_to_cache_name(dependency)
+    target_folder = os.path.join(cache_dir, dep_cache_name)
+    uri = urllib.parse.urlsplit(dependency)
+
+    # handle local filesystem URIs
+    if uri.scheme == "":
+        if os.path.isabs(uri.path):
+            filepath = uri.path
+        else:
+            filepath = os.path.join(target_directory, uri.path)
+        shutil.copytree(filepath, target_folder)
+
+    # don't handle other URI kinds
+    else:
+        raise AsmmError(f"unsupported URI scheme '{uri.scheme}'")
+
+
+def _dependency_to_cache_name(dependency):
+    return hashlib.sha256(dependency.encode()).hexdigest()
