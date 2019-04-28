@@ -26,7 +26,37 @@ class TestDependencies(unittest.TestCase):
         dependencies = asmm.list_dependencies(self.temp_env.name)
         self.assertListEqual(expected_dependencies, dependencies)
 
+    def test_add_dependency(self):
+        self._write_project_file({
+            "dependencies": []
+        })
+        asmm.add_dependency(self.temp_env.name, "test-dependency")
+        project = self._read_project_file()
+        self.assertListEqual(project["dependencies"], ["test-dependency"])
+
+    def test_add_multiple_dependencies(self):
+        self._write_project_file({
+            "dependencies": []
+        })
+        asmm.add_dependency(self.temp_env.name, "first-dependency")
+        asmm.add_dependency(self.temp_env.name, "second-dependency")
+        project = self._read_project_file()
+        self.assertListEqual(project["dependencies"], ["first-dependency", "second-dependency"])
+
+    def test_add_repeated_dependencies_should_fail(self):
+        self._write_project_file({
+            "dependencies": []
+        })
+        asmm.add_dependency(self.temp_env.name, "dep")
+        with self.assertRaises(asmm.AsmmError):
+            asmm.add_dependency(self.temp_env.name, "dep")
+
     def _write_project_file(self, yml):
         path = self.temp_env.path_into(".asmm/config.yml")
         with open(path, 'w') as file:
             yaml.dump(yml, file)
+
+    def _read_project_file(self):
+        path = self.temp_env.path_into(".asmm/config.yml")
+        with open(path) as file:
+            return yaml.load(file, Loader=yaml.SafeLoader)

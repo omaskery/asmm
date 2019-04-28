@@ -2,7 +2,7 @@ import argparse
 import os
 
 
-from . import initialise, build, list_dependencies
+from . import initialise, build, list_dependencies, add_dependency
 
 
 def main():
@@ -29,6 +29,11 @@ def main():
     deps_subparsers = deps_parser.add_subparsers()
     deps_list_parser = deps_subparsers.add_parser('list', help='list project dependencies')
     deps_list_parser.set_defaults(func=_deps_list, parser=deps_list_parser)
+    deps_add_parser = deps_subparsers.add_parser('add', help='add a project dependency')
+    deps_add_parser.add_argument(
+        'dependency', help='URI of the dependency to add'
+    )
+    deps_add_parser.set_defaults(func=_deps_add, parser=deps_add_parser)
     args = parser.parse_args()
 
     if args.func is None:
@@ -56,6 +61,11 @@ def _deps_list(args):
     dependencies = list_dependencies(path)
     for dependency in dependencies:
         print(f"{dependency}")
+
+
+def _deps_add(args):
+    path = os.getcwd() if args.directory is None else args.directory
+    add_dependency(path, args.dependency)
 
 
 if __name__ == "__main__":
