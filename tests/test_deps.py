@@ -77,7 +77,7 @@ class TestDependencies(unittest.TestCase):
             "dependencies": [uri]
         }, prefix="proj_a")
 
-        asmm.fetch_dependencies(os.path.join(self.temp_env.name, "proj_a"))
+        asmm.sync_dependencies(os.path.join(self.temp_env.name, "proj_a"))
 
         cache_name = hashlib.sha256(uri.encode()).hexdigest()
         self.temp_env.assert_folder_exists(os.path.join("proj_a/.asmm/cache/deps", cache_name))

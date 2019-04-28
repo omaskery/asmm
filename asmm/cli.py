@@ -39,6 +39,12 @@ def main():
         'dependency', help='URI of the dependency to remove'
     )
     deps_remove_parser.set_defaults(func=_deps_rm, parser=deps_remove_parser)
+    deps_sync_parser = deps_subparsers.add_parser('sync', help='sync project dependencies')
+    deps_sync_parser.add_argument(
+        '-f', '--force-all', action='store_true',
+        help='forces dependencies to be synchronised even if already in cache'
+    )
+    deps_sync_parser.set_defaults(func=_deps_sync, parser=deps_sync_parser)
     args = parser.parse_args()
 
     if args.func is None:
@@ -79,6 +85,11 @@ def _deps_add(args):
 def _deps_rm(args):
     path = os.getcwd() if args.directory is None else args.directory
     asmm.remove_dependency(path, args.dependency)
+
+
+def _deps_sync(args):
+    path = os.getcwd() if args.directory is None else args.directory
+    asmm.sync_dependencies(path, args.force_all)
 
 
 if __name__ == "__main__":

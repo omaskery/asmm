@@ -49,7 +49,7 @@ def remove_dependency(target_directory, dependency):
     save_project(project, project_file_path)
 
 
-def fetch_dependencies(target_directory, force_all=False):
+def sync_dependencies(target_directory, force_all=False):
     """
     Retrieves dependencies from their specified URIs and populates the dependency cache
     :param target_directory: directory of the project to fetch dependencies of
@@ -63,8 +63,11 @@ def fetch_dependencies(target_directory, force_all=False):
             dependency for dependency in to_update
             if _dependency_to_cache_name(dependency) not in cached_dependencies
         ]
-    for dependency in to_update:
-        _fetch_dependency(target_directory, cache_dir, dependency)
+
+    while len(to_update) > 0:
+        dependency = to_update.pop(0)
+        _fetched_dependency = _fetch_dependency(target_directory, cache_dir, dependency)
+        # TODO: used fetched dependency to recurse
 
 
 def _fetch_dependency(target_directory, cache_dir, dependency):
@@ -83,6 +86,8 @@ def _fetch_dependency(target_directory, cache_dir, dependency):
     # don't handle other URI kinds
     else:
         raise AsmmError(f"unsupported URI scheme '{uri.scheme}'")
+
+    return target_folder
 
 
 def _dependency_to_cache_name(dependency):
