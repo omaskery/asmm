@@ -31,15 +31,15 @@ def build(target_directory):
     for mission in missions:
         src_path = os.path.join(mission_dir, mission)
         dst_path = os.path.join(build_dir, "missions", mission)
-        build_mission(assets_dir, src_path, dst_path)
+        _build_mission(assets_dir, src_path, dst_path)
 
     for mission in test_missions:
         src_path = os.path.join(test_mission_dir, mission)
         dst_path = os.path.join(build_dir, "test_missions", mission)
-        build_mission(assets_dir, src_path, dst_path)
+        _build_mission(assets_dir, src_path, dst_path)
 
 
-def build_mission(assets_dir, src_path, dst_path):
+def _build_mission(assets_dir, src_path, dst_path):
     """
     Builds a single mission by combining a template and the shared assets
     :param assets_dir: folder of shared assets to merge into the template
